@@ -360,3 +360,6 @@ MigrationBackup/
 cmake-build*
 
 !src/competitor/wormhole/src
+
+# Jupyter notebooks
+.ipynb_checkpoints/
