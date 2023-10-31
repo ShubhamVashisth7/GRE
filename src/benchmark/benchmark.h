@@ -106,7 +106,7 @@ public:
 
     KEY_TYPE *load_keys() {
         // Read keys from file
-        COUT_THIS("Reading data from file.");
+        COUT_THIS("-----------------------\nReading data from file.");
 
         if (table_size > 0) keys = new KEY_TYPE[table_size];
 
@@ -116,7 +116,7 @@ public:
             if (table_size <= 0) {
                 COUT_THIS("Could not open key file, please check the path of key file.");
                 exit(0);
-            }
+            }         
         } else if (keys_file_type == "text") {
             table_size = load_text_data(keys, table_size, keys_file_path);
             if (table_size <= 0) {
@@ -128,6 +128,8 @@ public:
             exit(0);
         }
 
+        std::cout << "1. TABLE SIZE: " << table_size << std::endl;
+
         if (!data_shift) {
             tbb::parallel_sort(keys, keys + table_size);
             auto last = std::unique(keys, keys + table_size);
@@ -136,7 +138,9 @@ public:
         }
 
         init_table_size = init_table_ratio * table_size;
-        std::cout << "Table size is " << table_size << ", Init table size is " << init_table_size << std::endl;
+        // std::cout << "Table size is " << table_size << ", Init table size is " << init_table_size << std::endl;
+        std::cout << "2. INIT TABLE RATIO: " << init_table_ratio << std::endl;
+        std::cout << "3. INIT TABLE SIZE: " << init_table_size << std::endl;
 
         for (auto j = 0; j < 10; j++) {
             std::cout << keys[j] << " ";
@@ -424,12 +428,14 @@ public:
         }
 
         printf("Throughput = %llu\n", stat.throughput);
+        /*
         printf("Memory: %lld\n", stat.memory_consumption);
         printf("success_read: %llu\n", stat.success_read);
         printf("success_insert: %llu\n", stat.success_insert);
         printf("success_update: %llu\n", stat.success_update);
         printf("success_remove: %llu\n", stat.success_remove);
         printf("scan_not_enough: %llu\n", stat.scan_not_enough);
+        */
 
         // time id
         std::time_t t = std::time(nullptr);

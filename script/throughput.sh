@@ -1,7 +1,7 @@
 num_iterations=3
-threads=(2 4 8 16 24 36) 
-datasets=("covid" "libio" "genome" "osm")
-index_techniques=("alexol" "btreeolc" "hot" "masstree" "xindex")
+threads=(1 2 4 8 16 24 36) 
+datasets=("covid")
+index_techniques=("alexol" "lippol" "xindex" "finedex" "artolc" "btreeolc" "hot" "masstree" "wormhole_u64")
 
 for dataset in "${datasets[@]}"
 do
@@ -14,10 +14,8 @@ do
                 echo "iteration: $i, dataset: $dataset, thread_num: $thread_num, index_technique: $index_technique"
                 ./build/microbench \
                 --keys_file=./datasets/$dataset \
-                --keys_file_type={binary,text} \
+                --keys_file_type=binary \
                 --read=1.0 --insert=0.0 \
-                --operations_num=800000000 \
-                --table_size=-1 \
                 --init_table_ratio=1.0 \
                 --thread_num=$thread_num \
                 --index=$index_technique
