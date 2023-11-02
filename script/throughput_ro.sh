@@ -1,5 +1,5 @@
 num_iterations=3
-threads=(1 2 4 8 16 24 36) 
+threads=(36 24 16 8 4 2 1) 
 datasets=("covid")
 index_techniques=("alexol" "lippol" "xindex" "finedex" "artolc" "btreeolc" "hot" "masstree" "wormhole_u64")
 
@@ -23,4 +23,3 @@ do
         done
     done
 done
-
