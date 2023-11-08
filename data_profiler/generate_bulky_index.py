@@ -1,6 +1,7 @@
 import time
+import random
 import numpy as np
-from tqdm import tqdm
+from scipy.stats import uniform
 from matplotlib import pyplot as plt
 
 np.random.seed(1866)
@@ -10,7 +11,7 @@ def time_taken(start, end):
     minutes, seconds = divmod(rem, 60)
     return "{:0>2}:{:0>2}:{:05.2f}".format(int(hours), int(minutes), seconds)
 
-def plot_cdf(data_sorted, dataset: str, keys: int):
+def plot_cdf(data_sorted, dataset: str):
     fontsize = 14
     y = np.arange(1, len(data_sorted) + 1) / len(data_sorted)
     plt.plot(data_sorted, y, color='cornflowerblue', linewidth=1.5)
@@ -20,41 +21,34 @@ def plot_cdf(data_sorted, dataset: str, keys: int):
     plt.xlim(left=0.0) 
     plt.title(dataset, fontsize=fontsize+4)
     plt.xlabel('Key domain', fontsize=fontsize)
-    plt.savefig(f'data_profiler/out/{dataset}_{keys}_cdf.png', dpi=300)
+    plt.savefig(f'data_profiler/out/{dataset}_{len(data_sorted)}_cdf.png', dpi=300)
 
-def generate(dataset: str, desired_key_num: int):
-    with open(f'datasets/{dataset}', 'rb') as f:
-        keys = np.sort(np.fromfile(f, dtype=np.uint64)[1:])
+def generate_linear_cdf_keys(num_keys):
+    min_val = 0
+    max_val = 2**64-1 # as per 3.2 in https://www.vldb.org/pvldb/vol15/p3004-wongkham.pdf, 8-byte unsigned integer key
 
-    keys_num = len(keys)
-    print(f'# keys in {dataset}: {keys_num}\nsample keys: ', keys[:5])
-    
-    keys_to_add = desired_key_num - keys_num 
-    print(f'adding additional {keys_to_add} keys')
-    
-    original_data_min = keys.min()
-    original_data_max = keys.max()
+    cdf = uniform(loc=min_val, scale=max_val - min_val) # linear CDF
 
-    keys = set(keys)
-    augmented_keys = set()
-    with tqdm(total=keys_to_add, desc='Augmenting keys', unit='key', leave=False) as pbar:
-        while len(augmented_keys) < keys_to_add:
-            new_key = np.random.randint(low=original_data_min, high=original_data_max, dtype=np.uint64)
-            if new_key not in keys and new_key not in augmented_keys:
-                augmented_keys.add(new_key)
-                pbar.update(1)
-    
-    print('done.')
-    combined_keys = np.sort(np.array(list(keys)+list(augmented_keys)))
-    print('# keys post augmentation: ', len(set(combined_keys)), '\nsample keys post augmentation: ', list(combined_keys)[:5])
+    print(f'generating {num_keys} keys')
+    random_values = cdf.rvs(size=num_keys+10000)
 
-    plot_cdf(data_sorted=combined_keys, dataset='big_' + dataset, keys=desired_key_num)
+    keys = set(np.sort(random_values).astype(np.uint64))
+    num_keys_to_remove = len(keys) - num_keys
 
-    combined_keys = np.insert(combined_keys, 0, len(combined_keys))
-    with open(f'/data/learned-index/big_{dataset}_{desired_key_num}', 'wb') as file:
-        file.write(combined_keys)
+    keys_to_delete = random.sample(list(keys), num_keys_to_remove)
+    for item in keys_to_delete:
+        keys.remove(item)
 
-if __name__ == '__main__':
-    start = time.time()
-    generate(dataset ='libio', desired_key_num=800*10**6)
-    print(f'done. in {time_taken(start=start, end=time.time())}')
+    keys = np.sort(np.array(list(keys))) 
+    print(f"generated {len(set(keys))} unique keys.\n sample keys: ", keys[:5])
+    plot_cdf(data_sorted=keys, dataset='synthetic')
+
+    keys = np.insert(keys, 0, len(keys))
+    with open(f'/data/learned-index/synthetic_{len(keys)-1}', 'wb') as file:
+        file.write(keys)
+
+if __name__ == "__main__":
+    start = time.time() 
+    num_keys = 2*10**9
+    generate_linear_cdf_keys(num_keys)
+    print('done in ', time_taken(start=start, end=time.time()))
