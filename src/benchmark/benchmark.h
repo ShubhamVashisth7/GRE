@@ -148,7 +148,7 @@ public:
         std::cout << std::endl;
 
         // prepare data
-        COUT_THIS("prepare init keys.");
+        COUT_THIS("resize init keys.");
         init_keys.resize(init_table_size);
 #pragma omp parallel for num_threads(thread_num)
         for (size_t i = 0; i < init_table_size; ++i) {
@@ -156,11 +156,12 @@ public:
         }
         tbb::parallel_sort(init_keys.begin(), init_keys.end());
 
+        COUT_THIS("prepare init keys.");
         init_key_values = new std::pair<KEY_TYPE, PAYLOAD_TYPE>[init_keys.size()];
 #pragma omp parallel for num_threads(thread_num)
         for (int i = 0; i < init_keys.size(); i++) {
             init_key_values[i].first = init_keys[i];
-            init_key_values[i].second = std::string(4 * 1024 * 1024, 'X');
+            init_key_values[i].second = std::string(4 * 1024, 'X');
         }
         COUT_VAR(table_size);
         COUT_VAR(init_keys.size());
@@ -348,10 +349,10 @@ public:
                     // }
                     thread_param.success_read += ret;
                 } else if (op == INSERT) {  // insert
-                    auto ret = index->put(key, std::string(4 * 1024 * 1024, 'X'), &paramI);
+                    auto ret = index->put(key, std::string(4 * 1024, 'X'), &paramI);
                     thread_param.success_insert += ret;
                 } else if (op == UPDATE) {  // update
-                    auto ret = index->update(key, std::string(4 * 1024 * 1024, 'Z'), &paramI);
+                    auto ret = index->update(key, std::string(4 * 1024, 'Z'), &paramI);
                     thread_param.success_update += ret;
                 } else if (op == SCAN) { // scan
                     auto scan_len = index->scan(key, scan_num, scan_result, &paramI);
