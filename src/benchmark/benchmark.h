@@ -21,7 +21,7 @@
 #include "utils.h"
 #include "../competitor/competitor.h"
 #include "../competitor/indexInterface.h"
-#include "pgm_metric.h"
+// #include "pgm_metric.h"
 #include <jemalloc/jemalloc.h>
 
 template<typename KEY_TYPE, typename PAYLOAD_TYPE>
@@ -160,7 +160,7 @@ public:
 #pragma omp parallel for num_threads(thread_num)
         for (int i = 0; i < init_keys.size(); i++) {
             init_key_values[i].first = init_keys[i];
-            init_key_values[i].second = 123456789;
+            init_key_values[i].second = std::string(4 * 1024 * 1024, 'X');
         }
         COUT_VAR(table_size);
         COUT_VAR(init_keys.size());
@@ -348,10 +348,10 @@ public:
                     // }
                     thread_param.success_read += ret;
                 } else if (op == INSERT) {  // insert
-                    auto ret = index->put(key, 123456789, &paramI);
+                    auto ret = index->put(key, std::string(4 * 1024 * 1024, 'X'), &paramI);
                     thread_param.success_insert += ret;
                 } else if (op == UPDATE) {  // update
-                    auto ret = index->update(key, 234567891, &paramI);
+                    auto ret = index->update(key, std::string(4 * 1024 * 1024, 'Z'), &paramI);
                     thread_param.success_update += ret;
                 } else if (op == SCAN) { // scan
                     auto scan_len = index->scan(key, scan_num, scan_result, &paramI);
@@ -395,10 +395,10 @@ public:
         stat.throughput = static_cast<uint64_t>(operations_num / (diff/(double) 1000000000));
 
         // calculate dataset metric
-        if (dataset_statistic) {
-            std::sort(keys, keys + table_size);
-            stat.fitness_of_dataset = pgmMetric::PGM_metric(keys, table_size, error_bound);
-        }
+        // if (dataset_statistic) {
+        //     std::sort(keys, keys + table_size);
+        //     stat.fitness_of_dataset = pgmMetric::PGM_metric(keys, table_size, error_bound);
+        // }
 
         // record memory consumption
         if (memory_record)
