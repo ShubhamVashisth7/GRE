@@ -17,7 +17,7 @@ do
                 --keys_file_type=binary \
                 --read=1.0 --insert=0.0 \
                 --init_table_ratio=1.0 \
-		--table_size=1000000 \
+		--table_size=60000000 \
                 --thread_num=$thread_num \
                 --index=$index_technique
             done
