@@ -148,7 +148,7 @@ long long load_binary_data(T *&data, long long length, const std::string &file_p
         return 0;
     }
 
-    std::cout << file_path << std::endl;
+    std::cout << file_path;
 
     // read the number of keys
     T max_size;

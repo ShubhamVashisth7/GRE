@@ -991,8 +991,8 @@ public:
     root_node_->model_.a_ = 1.0 / (max_key - min_key);
     root_node_->model_.b_ = -1.0 * min_key * root_node_->model_.a_;
 
-    std::cout << "Min key = " << min_key << std::endl;
-    std::cout << "Max key = " << max_key << std::endl;
+    // std::cout << "Min key = " << min_key << std::endl;
+    // std::cout << "Max key = " << max_key << std::endl;
 
     // Compute cost of root node
     LinearModel<T> root_data_node_model;
