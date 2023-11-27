@@ -21,7 +21,7 @@
 #include "utils.h"
 #include "../competitor/competitor.h"
 #include "../competitor/indexInterface.h"
-#include "pgm_metric.h"
+// #include "pgm_metric.h"
 #include <jemalloc/jemalloc.h>
 
 template<typename KEY_TYPE, typename PAYLOAD_TYPE>
@@ -106,7 +106,7 @@ public:
 
     KEY_TYPE *load_keys() {
         // Read keys from file
-        COUT_THIS("-----------------------\nReading data from file.");
+        // COUT_THIS("-----------------------\nReading data from file.");
 
         if (table_size > 0) keys = new KEY_TYPE[table_size];
 
@@ -128,32 +128,40 @@ public:
             exit(0);
         }
 
-        std::cout << "1. TABLE SIZE: " << table_size << std::endl;
+        // std::cout << "1. TABLE SIZE: " << table_size << std::endl;
 
         if (!data_shift) {
+            std::cout << "2. SORTING KEYS" << std::endl;
             tbb::parallel_sort(keys, keys + table_size);
+            std::cout << "3. REMOVING CONSECUTIVE KEYS" << std::endl;
             auto last = std::unique(keys, keys + table_size);
             table_size = last - keys;
+            std::cout << "4. SHUFFLING KEYS" << std::endl;
             std::shuffle(keys, keys + table_size, gen);
         }
 
         init_table_size = init_table_ratio * table_size;
         // std::cout << "Table size is " << table_size << ", Init table size is " << init_table_size << std::endl;
-        std::cout << "2. INIT TABLE RATIO: " << init_table_ratio << std::endl;
-        std::cout << "3. INIT TABLE SIZE: " << init_table_size << std::endl;
+        // std::cout << "2. INIT TABLE RATIO: " << init_table_ratio << std::endl;
+        // std::cout << "3. INIT TABLE SIZE: " << init_table_size << std::endl;
 
+        // std::cout << "table size = " << table_size <<" | init table ratio = " << init_table_ratio <<" | init table size = " << init_table_size << std::endl;
+
+        // std::cout << "first 10 keys";
         for (auto j = 0; j < 10; j++) {
             std::cout << keys[j] << " ";
         }
         std::cout << std::endl;
 
         // prepare data
-        COUT_THIS("prepare init keys.");
+        //COUT_THIS("prepare init keys.");
+        // std::cout <<"4. RESIZING KEYS TO " << init_table_size << " (init table size)" << std::endl;
         init_keys.resize(init_table_size);
 #pragma omp parallel for num_threads(thread_num)
         for (size_t i = 0; i < init_table_size; ++i) {
             init_keys[i] = (keys[i]);
         }
+        // std:cout<<"5. SORTING KEYS" << std::endl;
         tbb::parallel_sort(init_keys.begin(), init_keys.end());
 
         init_key_values = new std::pair<KEY_TYPE, PAYLOAD_TYPE>[init_keys.size()];
@@ -395,10 +403,10 @@ public:
         stat.throughput = static_cast<uint64_t>(operations_num / (diff/(double) 1000000000));
 
         // calculate dataset metric
-        if (dataset_statistic) {
-            std::sort(keys, keys + table_size);
-            stat.fitness_of_dataset = pgmMetric::PGM_metric(keys, table_size, error_bound);
-        }
+        // if (dataset_statistic) {
+        //     std::sort(keys, keys + table_size);
+        //     stat.fitness_of_dataset = pgmMetric::PGM_metric(keys, table_size, error_bound);
+        // }
 
         // record memory consumption
         if (memory_record)
@@ -516,6 +524,7 @@ public:
     }
 
     void run_benchmark() {
+        std::cout<< "1. LOADING KEYS" << std::endl;
         load_keys();
         generate_operations(keys);
         for (auto s: all_index_type) {
