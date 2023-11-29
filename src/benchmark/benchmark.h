@@ -488,6 +488,7 @@ public:
         print_stat();
 
         delete[] thread_array;
+        std::cout << "done." << std::endl;
     }
 
     void print_stat(bool header = false, bool clear_flag = true)
