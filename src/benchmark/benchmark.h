@@ -62,7 +62,7 @@ class Benchmark
     int error_bound;
     std::string output_path;
     size_t random_seed;
-    bool memory_record;
+    bool memory_record = true;
     bool dataset_statistic;
     bool data_shift = false;
 
@@ -183,7 +183,7 @@ public:
 
         // prepare data
         // COUT_THIS("prepare init keys.");
-        std::cout << "4. RESIZING KEYS TO init table size = " << init_table_size;
+        std::cout << "5. RESIZING KEYS TO init table size = " << init_table_size;
         init_keys.resize(init_table_size);
 #pragma omp parallel for num_threads(thread_num)
         for (size_t i = 0; i < init_table_size; ++i)
@@ -191,11 +191,11 @@ public:
             init_keys[i] = (keys[i]);
         }
         std::cout << " done." << std::endl;
-        std::cout << "5. SORTING KEYS";
+        std::cout << "6. SORTING KEYS";
         tbb::parallel_sort(init_keys.begin(), init_keys.end());
         std::cout << " done." << std::endl;
 
-        std::cout << "6. GENERATE KEY-VALUE PAIRS";
+        std::cout << "7. GENERATE KEY-VALUE PAIRS";
         init_key_values = new std::pair<KEY_TYPE, PAYLOAD_TYPE>[init_keys.size()];
 #pragma omp parallel for num_threads(thread_num)
         for (int i = 0; i < init_keys.size(); i++)
@@ -222,7 +222,7 @@ public:
         thread_num = param.worker_num;
 
         //COUT_THIS("bulk loading");
-        std::cout << "8. BULK LOADING ";
+        std::cout << "9. BULK LOADING ";
         index->bulk_load(init_key_values, init_keys.size(), &param);
         std::cout << "done." << std::endl;
     }
@@ -271,7 +271,7 @@ public:
         output_path = get_with_default(flags, "output_path", "./out.csv");
         random_seed = stoul(get_with_default(flags, "seed", "1866"));
         gen.seed(random_seed);
-        memory_record = get_boolean_flag(flags, "memory");
+        memory_record = true; // get_boolean_flag(flags, "memory");
         dataset_statistic = get_boolean_flag(flags, "dataset_statistic");
         data_shift = get_boolean_flag(flags, "data_shift");
 
@@ -317,7 +317,7 @@ public:
         }
 
         std::cout << std::endl << "read ratio = " << read_ratio << " | insert ratio = " << insert_ratio << " | update ratio = " << update_ratio <<" | scan ratio = " << scan_ratio << " | delete ratio = " << delete_ratio << std::endl << std::endl;
-        std::cout << "7. GENERATING OPERATIONS ";
+        std::cout << "8. GENERATING OPERATIONS ";
         size_t temp_counter = 0;
         for (size_t i = 0; i < operations_num; ++i)
         {
@@ -359,11 +359,10 @@ public:
                 // operations.push_back(std::pair<Operation, KEY_TYPE>(DELETE, sample_ptr[sample_counter++]));
             }
         }
-        std::cout << "done." << std::endl;
-
         // COUT_VAR(operations.size());
 
         delete[] sample_ptr; // deallocate memory
+        std::cout << "done." << std::endl;
     }
 
     void run(index_t *index)
@@ -372,7 +371,7 @@ public:
         param_t params[thread_num];
         TSCNS tn;
         tn.init();
-        printf("Begin running\n");
+        std::cout << "10. RUNNING " << index_type;
         auto start_time = tn.rdtsc();
         auto end_time = tn.rdtsc();
         //    System::profile("perf.data", [&]() {
@@ -453,7 +452,7 @@ public:
 
         //    });
         auto diff = tn.tsc2ns(end_time) - tn.tsc2ns(start_time);
-        printf("Finish running\n");
+        std::cout << " done." << std::endl;
 
         // gather thread local variable
         for (auto &p : params)
@@ -488,7 +487,7 @@ public:
         print_stat();
 
         delete[] thread_array;
-        std::cout << "done." << std::endl;
+        // std::cout << "done." << std::endl;
     }
 
     void print_stat(bool header = false, bool clear_flag = true)
@@ -513,9 +512,9 @@ public:
             std::sort(stat.latency.begin(), stat.latency.end());
         }
 
-        printf("Throughput = %llu\n", stat.throughput);
-        /*
+        printf("\nThroughput = %llu\n", stat.throughput);
         printf("Memory: %lld\n", stat.memory_consumption);
+        /*
         printf("success_read: %llu\n", stat.success_read);
         printf("success_insert: %llu\n", stat.success_insert);
         printf("success_update: %llu\n", stat.success_update);
