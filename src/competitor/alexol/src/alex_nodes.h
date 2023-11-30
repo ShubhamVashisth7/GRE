@@ -1587,12 +1587,18 @@ public:
     int predicted_pos = predict_position(key);
     // The last key slot with a certain value is guaranteed to be a real key
     // (instead of a gap)
+    std::cout << "predicted position = " << predicted_pos << std::endl;
     int pos = exponential_search_upper_bound(predicted_pos, key) - 1;
+    std::cout << "position after exponential search = " << predicted_pos << std::endl;
+    // std::cout<< "value at position " << pos << " = "<< ALEX_DATA_NODE_KEY_AT(pos) << std::endl;
+    std::cout<< "value at position " << pos << " = " << ALEX_DATA_NODE_PAYLOAD_AT(pos) << std::endl;
     if (!(pos < 0 || !key_equal(ALEX_DATA_NODE_KEY_AT(pos), key))) {
       *payload = get_payload(pos);
       *found = true;
+      std::cout<< "found." << std::endl;
     } else {
       *found = false;
+      std::cout<< "not found." << std::endl;
     }
     if (test_lock_version_change(
             version)) // Test whether the version is changed or not

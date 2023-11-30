@@ -371,7 +371,7 @@ public:
         param_t params[thread_num];
         TSCNS tn;
         tn.init();
-        std::cout << "10. RUNNING " << index_type;
+        std::cout << "10. RUNNING " << index_type << std::endl;
         auto start_time = tn.rdtsc();
         auto end_time = tn.rdtsc();
         //    System::profile("perf.data", [&]() {
@@ -402,9 +402,10 @@ public:
 
                 if (latency_sample && i % latency_sample_interval == 0)
                     latency_sample_start_time = tn.rdtsc();
-
+;
                 if (op == READ)
                 { // get
+                    std::cout<< "\ninput key = " << key << ", value = 123456789" << std::endl;
                     auto ret = index->get(key, val, &paramI);
                     // if(!ret) {
                     //     printf("read not found, Key %lu\n",key);
@@ -452,7 +453,7 @@ public:
 
         //    });
         auto diff = tn.tsc2ns(end_time) - tn.tsc2ns(start_time);
-        std::cout << " done." << std::endl;
+        // std::cout << " done." << std::endl;
 
         // gather thread local variable
         for (auto &p : params)
