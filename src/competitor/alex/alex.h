@@ -19,7 +19,7 @@ public:
   size_t scan(KEY_TYPE key_low_bound, size_t key_num, std::pair<KEY_TYPE, PAYLOAD_TYPE> *result,
               Param *param = nullptr);
 
-  long long memory_consumption() { return index.model_size() + index.data_size(); }
+  long long memory_consumption() { return index.model_size(); }
 
 private:
   alex::Alex<KEY_TYPE, PAYLOAD_TYPE, alex::AlexCompare, std::allocator < std::pair < KEY_TYPE, PAYLOAD_TYPE>>, false>
