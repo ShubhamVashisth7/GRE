@@ -976,12 +976,14 @@ public:
   // The number of elements should be num_keys.
   // The index must be empty when calling this method.
   void bulk_load(const V values[], int num_keys) {
+    std::cout << "\nfirst line of ALEX bulk loading started" << std::endl;
     if (stats_.num_keys > 0 || num_keys <= 0) {
       return;
     }
     delete_node(root_node_); // delete the empty root node from constructor
 
     stats_.num_keys = num_keys;
+    // std::cout << "num keys = " << num_keys << std::endl;
 
     // Build temporary root model, which outputs a CDF in the range [0, 1]
     root_node_ =
@@ -1069,6 +1071,7 @@ private:
     // T debug_key = 68052112994;
     //  Automatically convert to data node when it is impossible to be better
     //  than current cost
+    std::cout << "bulk loading node" << std::endl;
     if (num_keys <= derived_params_.max_data_node_slots *
                         data_node_type::kInitDensity_ &&
         (node->cost_ < kNodeLookupsWeight || node->model_.a_ == 0)) {
@@ -1078,6 +1081,7 @@ private:
                          key_less_, allocator_);
       data_node->min_limit_ = min_limit;
       data_node->max_limit_ = max_limit;
+      
       data_node->bulk_load(values, num_keys, data_node_model,
                            params_.approximate_model_computation);
       data_node->cost_ = node->cost_;
@@ -1740,6 +1744,7 @@ public:
 
   template <class InputIterator>
   void insert(InputIterator first, InputIterator last) {
+    std::cout << "inserting..." << std::endl;
     for (auto it = first; it != last; ++it) {
       insert(*it);
     }

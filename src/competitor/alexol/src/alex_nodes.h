@@ -1294,7 +1294,7 @@ public:
     for (int i = 0; i < num_keys; i++) {
       int position = this->model_.predict(values[i].first);
       position = std::max<int>(position, last_position + 1);
-
+      std::cout << "model-based insert | key " << values[i].first << " at pred pos " << position << std::endl;
       int positions_remaining = data_capacity_ - position;
       if (positions_remaining < keys_remaining) {
         // fill the rest of the store contiguously
@@ -1343,6 +1343,18 @@ public:
     contraction_threshold_ = data_capacity_ * kMinDensity_;
     min_key_ = values[0].first;
     max_key_ = values[num_keys - 1].first;
+
+
+
+    for (int i = 0; i < data_capacity_; ++i) {
+#if ALEX_DATA_NODE_SEP_ARRAYS
+    std::cout << "Payload at index " << i << ": " << payload_slots_[i] << std::endl;
+#else
+    // Print the payload value or data structure depending on the data type
+    std::cout << "Payload at index " << i << ": " << data_slots_[i] << std::endl;
+#endif
+}
+
   }
 
   // Bulk load using the keys between the left and right positions in
