@@ -1,5 +1,5 @@
 #include"./indexInterface.h"
-#include "./alex/alex.h"
+// #include "./alex/alex.h"
 #include "./alexol/alex.h"
 // #include "./artsync/artrowex.h"
 // #include "./artsync/artolc.h"
@@ -24,9 +24,9 @@ indexInterface<KEY_TYPE, PAYLOAD_TYPE> *get_index(std::string index_type) {
   if (index_type == "alexol") {
     index = new alexolInterface<KEY_TYPE, PAYLOAD_TYPE>;
   }
-  else if(index_type == "alex") {
-    index = new alexInterface<KEY_TYPE, PAYLOAD_TYPE>;
-  }
+  // else if(index_type == "alex") {
+  //   index = new alexInterface<KEY_TYPE, PAYLOAD_TYPE>;
+  // }
   // else if (index_type == "btreeolc") {
   //   index = new BTreeOLCInterface<KEY_TYPE, PAYLOAD_TYPE>;
   // }

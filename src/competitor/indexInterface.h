@@ -24,7 +24,7 @@ class indexInterface {
 public:
   virtual void bulk_load(std::pair <KEY_TYPE, PAYLOAD_TYPE> *key_value, size_t num, Param *param = nullptr) = 0;
 
-  virtual bool get(KEY_TYPE key, PAYLOAD_TYPE &val, Param *param = nullptr) = 0;
+  virtual PAYLOAD_TYPE get(KEY_TYPE key, PAYLOAD_TYPE &val, Param *param = nullptr) = 0;
 
   virtual bool put(KEY_TYPE key, PAYLOAD_TYPE value, Param *param = nullptr) = 0;
 

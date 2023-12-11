@@ -10,7 +10,7 @@ public:
 
     void bulk_load(std::pair <KEY_TYPE, PAYLOAD_TYPE> *key_value, size_t num, Param *param = nullptr);
 
-    bool get(KEY_TYPE key, PAYLOAD_TYPE &val, Param *param = nullptr);
+    PAYLOAD_TYPE get(KEY_TYPE key, PAYLOAD_TYPE &val, Param *param = nullptr);
 
     bool put(KEY_TYPE key, PAYLOAD_TYPE value, Param *param = nullptr);
 
@@ -42,9 +42,8 @@ void alexolInterface<KEY_TYPE, PAYLOAD_TYPE>::bulk_load(std::pair <KEY_TYPE, PAY
 }
 
 template<class KEY_TYPE, class PAYLOAD_TYPE>
-bool alexolInterface<KEY_TYPE, PAYLOAD_TYPE>::get(KEY_TYPE key, PAYLOAD_TYPE &val, Param *param) {
-    auto ret = index.get_payload(key, &val);
-    return ret;
+PAYLOAD_TYPE alexolInterface<KEY_TYPE, PAYLOAD_TYPE>::get(KEY_TYPE key, PAYLOAD_TYPE &val, Param *param) {
+    return index.get_payload(key, &val);
 }
 
 template<class KEY_TYPE, class PAYLOAD_TYPE>

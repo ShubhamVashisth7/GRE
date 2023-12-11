@@ -171,7 +171,6 @@ public:
 
         // Seperately allocated space in memory
         void** p_array = new void*[init_keys.size()];
-        std::cout << "allocating 800 bytes for " << init_keys.size() << " keys in memory" << std::endl;
         
         for (size_t i = 0; i < init_keys.size(); ++i) {
             p_array[i] = malloc(800); // Allocate 800 bytes of memory for each key and store the pointer
@@ -362,7 +361,8 @@ public:
                     latency_sample_start_time = tn.rdtsc();
 
                 if (op == READ) {  // get
-                    auto ret = index->get(key, val, &paramI);
+                    PAYLOAD_TYPE ret = index->get(key, val, &paramI);
+                    *ret = 1;
                     // if(!ret) {
                     //     printf("read not found, Key %lu\n",key);
                     //     continue;
@@ -371,21 +371,21 @@ public:
                     //     printf("read failed, Key %lu, val %llu\n",key, val);
                     //     exit(1);
                     // }
-                    thread_param.success_read += ret;
+                    // thread_param.success_read += ret;
                 // } else if (op == INSERT) {  // insert
                 //     auto ret = index->put(key, 123456789, &paramI);
                 //     thread_param.success_insert += ret;
                 // } else if (op == UPDATE) {  // update
                 //     auto ret = index->update(key, 234567891, &paramI);
                 //     thread_param.success_update += ret;
-                } else if (op == SCAN) { // scan
-                    auto scan_len = index->scan(key, scan_num, scan_result, &paramI);
-                    if (scan_len != scan_num) {
-                        thread_param.scan_not_enough++;
-                    }
-                } else if (op == DELETE) { // delete
-                    auto ret = index->remove(key, &paramI);
-                    thread_param.success_remove += ret;
+                // } else if (op == SCAN) { // scan
+                //     auto scan_len = index->scan(key, scan_num, scan_result, &paramI);
+                //     if (scan_len != scan_num) {
+                //         thread_param.scan_not_enough++;
+                //     }
+                // } else if (op == DELETE) { // delete
+                //     auto ret = index->remove(key, &paramI);
+                //     thread_param.success_remove += ret;
                 }
                 if (latency_sample && i % latency_sample_interval == 0) {
                     latency_sample_end_time = tn.rdtsc();

@@ -1323,14 +1323,23 @@ public:
   // Directly returns a pointer to the payload found through find(key)
   // This avoids the overhead of creating an iterator
   // Returns null pointer if there is no exact match of the key
-  bool get_payload(const T &key, P *payload) const {
+  // bool get_payload(const T &key, P *payload) const {
+  //   EpochGuard guard;
+  //   do {
+  //     data_node_type *leaf = get_leaf(key);
+  //     bool found = false;
+  //     p* ret_flag = leaf->find_payload(key, payload, &found);
+  //     if (ret_flag == true)
+  //       return found; // ret_flag == true means no concurrency conlict occurs
+  //   } while (true);
+  // }
+
+    P get_payload(const T &key, P *payload) const {
     EpochGuard guard;
     do {
       data_node_type *leaf = get_leaf(key);
       bool found = false;
-      auto ret_flag = leaf->find_payload(key, payload, &found);
-      if (ret_flag == true)
-        return found; // ret_flag == true means no concurrency conlict occurs
+      return leaf->find_payload(key, payload, &found);
     } while (true);
   }
 
