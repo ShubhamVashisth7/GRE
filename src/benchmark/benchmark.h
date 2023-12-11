@@ -26,6 +26,9 @@
 
 template<typename KEY_TYPE, typename PAYLOAD_TYPE>
 class Benchmark {
+
+    void** p_array;
+
     typedef indexInterface <KEY_TYPE, PAYLOAD_TYPE> index_t;
 
     enum Operation {
@@ -104,6 +107,16 @@ public:
     Benchmark() {
     }
 
+    ~Benchmark() {
+    // Clean up p_array
+        if (p_array != nullptr) {
+            for (size_t i = 0; i < init_keys.size(); ++i) {
+                free(p_array[i]); // Deallocate memory for each key
+            }
+            delete[] p_array; // Deallocate the array of pointers
+        }
+    }
+
     KEY_TYPE *load_keys() {
         // Read keys from file
         COUT_THIS("-----------------------\nReading data from file.");
@@ -156,11 +169,23 @@ public:
         }
         tbb::parallel_sort(init_keys.begin(), init_keys.end());
 
+        // Seperately allocated space in memory
+        void** p_array = new void*[init_keys.size()];
+        std::cout << "allocating 800 bytes for " << init_keys.size() << " keys in memory" << std::endl;
+        
+        for (size_t i = 0; i < init_keys.size(); ++i) {
+            p_array[i] = malloc(800); // Allocate 800 bytes of memory for each key and store the pointer
+             if (p_array[i] == nullptr) {
+                continue; //TODO: handle memory leaks 
+            }
+        }
+
+
         init_key_values = new std::pair<KEY_TYPE, PAYLOAD_TYPE>[init_keys.size()];
 #pragma omp parallel for num_threads(thread_num)
         for (int i = 0; i < init_keys.size(); i++) {
             init_key_values[i].first = init_keys[i];
-            init_key_values[i].second = 123456789;
+            init_key_values[i].second = reinterpret_cast<PAYLOAD_TYPE>(p_array[i]);
         }
         COUT_VAR(table_size);
         COUT_VAR(init_keys.size());
@@ -347,12 +372,12 @@ public:
                     //     exit(1);
                     // }
                     thread_param.success_read += ret;
-                } else if (op == INSERT) {  // insert
-                    auto ret = index->put(key, 123456789, &paramI);
-                    thread_param.success_insert += ret;
-                } else if (op == UPDATE) {  // update
-                    auto ret = index->update(key, 234567891, &paramI);
-                    thread_param.success_update += ret;
+                // } else if (op == INSERT) {  // insert
+                //     auto ret = index->put(key, 123456789, &paramI);
+                //     thread_param.success_insert += ret;
+                // } else if (op == UPDATE) {  // update
+                //     auto ret = index->update(key, 234567891, &paramI);
+                //     thread_param.success_update += ret;
                 } else if (op == SCAN) { // scan
                     auto scan_len = index->scan(key, scan_num, scan_result, &paramI);
                     if (scan_len != scan_num) {
@@ -362,7 +387,6 @@ public:
                     auto ret = index->remove(key, &paramI);
                     thread_param.success_remove += ret;
                 }
-
                 if (latency_sample && i % latency_sample_interval == 0) {
                     latency_sample_end_time = tn.rdtsc();
                     thread_param.latency.push_back(std::make_pair(latency_sample_start_time, latency_sample_end_time));
