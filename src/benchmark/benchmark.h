@@ -173,7 +173,7 @@ public:
         void** p_array = new void*[init_keys.size()];
         
         for (size_t i = 0; i < init_keys.size(); ++i) {
-            p_array[i] = malloc(800); // Allocate 800 bytes of memory for each key and store the pointer
+            p_array[i] = malloc(80); // Allocate 80 bytes of memory for each key and store the pointer
              if (p_array[i] == nullptr) {
                 continue; //TODO: handle memory leaks 
             }
