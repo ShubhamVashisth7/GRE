@@ -21,7 +21,9 @@ public:
     size_t scan(KEY_TYPE key_low_bound, size_t key_num, std::pair<KEY_TYPE, PAYLOAD_TYPE> *result,
                 Param *param = nullptr);
 
-    long long memory_consumption() { return index.model_size() + index.data_size(); }
+    long long memory_consumption() {
+        std::cout << "model size: " << index.model_size() << " | " << index.data_size() << std::endl; 
+        return index.model_size() + index.data_size(); }
 
 private:
     alexol::Alex <KEY_TYPE, PAYLOAD_TYPE, alexol::AlexCompare, std::allocator<
