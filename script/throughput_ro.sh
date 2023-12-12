@@ -1,7 +1,7 @@
 num_iterations=3
-threads=(36 24 16 8 4 2 1) 
-datasets=("covid")
-index_techniques=("alexol" "lippol" "xindex" "finedex" "artolc" "btreeolc" "hot" "masstree" "wormhole_u64")
+threads=(16 8 4 2 1) 
+datasets=("libio")
+index_techniques=("alexol")
 
 for dataset in "${datasets[@]}"
 do
@@ -17,8 +17,11 @@ do
                 --keys_file_type=binary \
                 --read=1.0 --insert=0.0 \
                 --init_table_ratio=1.0 \
+                --table_size=20000000 \
+                --operations_num=100000000 \
                 --thread_num=$thread_num \
-                --index=$index_technique
+                --index=$index_technique \
+                --memory
             done
         done
     done
